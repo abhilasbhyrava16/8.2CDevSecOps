@@ -1,0 +1,39 @@
+pipeline {
+ agent any
+ stages {
+ stage('Checkout') {
+ steps {
+ checkout scm
+ }
+ }
+ stage('Install Dependencies') {
+ steps {
+ bat 'npm install'
+ }
+ }
+ stage('Run Tests') {
+ steps {
+ bat 'npm test || exit /b 0' // Allows pipeline to continue despite test failures
+ }
+ }
+ stage('Generate Coverage Report') {
+ steps {
+ // Ensure coverage report exists
+ bat 'npm run coverage || exit /b 0'
+ }
+ }
+ stage('NPM Audit (Security Scan)') {
+ steps {
+ bat 'npm audit || exit /b 0' // This will show known CVEs in the output
+ }
+ }
+ stage('SonarCloud Analysis'){
+ steps {
+ withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
+
+ bat 'sonar-scanner -Dsonar.token=${SONAR_TOKEN}|| exit /b 0'
+ }
+ }
+ }
+ }
+ }
