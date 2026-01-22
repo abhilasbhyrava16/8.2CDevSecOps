@@ -18,8 +18,10 @@ module.exports = {
   },
 
   forbidden : function ( res ){
-    var body       = 'Forbidden';
+    var body;
     res.statusCode = 403;
+
+    body = 'Forbidden';
 
     res.setHeader( 'Content-Type', 'text/plain' );
     res.setHeader( 'Content-Length', body.length );
